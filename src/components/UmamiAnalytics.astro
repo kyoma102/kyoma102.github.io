@@ -1,0 +1,23 @@
+---
+// Umami Analytics 组件
+// 使用方式: <UmamiAnalytics websiteId="YOUR-WEBSITE-ID" src="https://your-umami-instance.com/umami.js" />
+export interface Props {
+  websiteId: string;
+  src: string;
+}
+
+const { websiteId, src } = Astro.props;
+---
+
+{
+  websiteId && src && (
+    <>
+      <script 
+        async 
+        defer
+        data-website-id={websiteId}
+        src={src}>
+      </script>
+    </>
+  )
+}

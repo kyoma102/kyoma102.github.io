@@ -1,5 +1,8 @@
 ---
 import { ClientRouter } from 'astro:transitions'
+import GoogleAnalytics from './GoogleAnalytics.astro'
+import UmamiAnalytics from './UmamiAnalytics.astro'
+import PlausibleAnalytics from './PlausibleAnalytics.astro'
 import '../styles/fonts.css'
 import '../styles/global.css'
 
@@ -7,9 +10,14 @@ export interface Props {
   title: string
   description: string
   permalink: string
+  gaId?: string
+  umamiWebsiteId?: string
+  umamiSrc?: string
+  plausibleDomain?: string
+  plausibleSrc?: string
 }
 
-const { title, description, permalink } = Astro.props
+const { title, description, permalink, gaId, umamiWebsiteId, umamiSrc, plausibleDomain, plausibleSrc } = Astro.props
 const socialUrl = Astro.site.href + 'assets/social.png'
 ---
 
@@ -38,6 +46,11 @@ const socialUrl = Astro.site.href + 'assets/social.png'
 <meta property="twitter:image" content={socialUrl} />
 
 <ClientRouter />
+
+<!-- Analytics -->
+{gaId && <GoogleAnalytics gaId={gaId} />}
+{umamiWebsiteId && umamiSrc && <UmamiAnalytics websiteId={umamiWebsiteId} src={umamiSrc} />}
+{plausibleDomain && plausibleSrc && <PlausibleAnalytics domain={plausibleDomain} src={plausibleSrc} />}
 
 <!-- This is intentionally inlined to avoid FOUC -->
 <script is:inline>

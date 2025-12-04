@@ -8,12 +8,26 @@ export interface Props {
   description: string;
   permalink: string;
   current?: string;
+  gaId?: string;
+  umamiWebsiteId?: string;
+  umamiSrc?: string;
+  plausibleDomain?: string;
+  plausibleSrc?: string;
 }
-const { title, description, permalink, current } = Astro.props;
+const { title, description, permalink, current, gaId, umamiWebsiteId, umamiSrc, plausibleDomain, plausibleSrc } = Astro.props;
 ---
 <html lang="en">
 <head>
-  <BaseHead title={title} description={description} permalink={permalink} />
+  <BaseHead
+    title={title}
+    description={description}
+    permalink={permalink}
+    gaId={gaId}
+    umamiWebsiteId={umamiWebsiteId}
+    umamiSrc={umamiSrc}
+    plausibleDomain={plausibleDomain}
+    plausibleSrc={plausibleSrc}
+  />
 </head>
 <body>
   <div class="layout">

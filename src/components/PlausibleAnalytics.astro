@@ -1,0 +1,23 @@
+---
+// Plausible Analytics 组件
+// 使用方式: <PlausibleAnalytics domain="yourdomain.com" src="https://plausible.io/js/plausible.js" />
+export interface Props {
+  domain: string;
+  src: string;
+}
+
+const { domain, src } = Astro.props;
+---
+
+{
+  domain && src && (
+    <>
+      <script 
+        async 
+        defer
+        data-domain={domain}
+        src={src}>
+      </script>
+    </>
+  )
+}

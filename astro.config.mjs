@@ -23,4 +23,8 @@ export default defineConfig({
       ],
     ],
   },
+  build: {
+    // 允许内联脚本
+    inlineStylesheets: 'auto',
+  },
 })
