@@ -35,26 +35,20 @@ const categories = [...new Set(allPosts.map(post => post.data.category || 'tech'
   <div class="home-container">
     <div class="home-copy">
       <!-- 分类导航 -->
-      <div class="categories-grid">
-        {categories.map(category => {
-          const categoryPosts = postsByCategory[category] || [];
-          return (
-            <a href={`/category/${category}`} class="category-card">
-              <div class="category-header">
-                <h3>{category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-                <span class="post-count">{categoryPosts.length} posts</span>
-              </div>
-              <div class="latest-posts">
-                {categoryPosts.slice(0, 3).map(post => (
-                  <div class="post-preview">
-                    <span class="post-title">{post.data.title}</span>
-                    <span class="post-date">{post.data.publishDate}</span>
-                  </div>
-                ))}
-              </div>
-            </a>
-          )
-        })}
+      <div class="categories-container">
+        <div class="categories-grid">
+          {categories.map(category => {
+            const categoryPosts = postsByCategory[category] || [];
+            return (
+              <a href={`/category/${category}`} class="category-card">
+                <div class="category-header">
+                  <h3>{category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                  <div class="post-count">{categoryPosts.length} posts</div>
+                </div>
+              </a>
+            )
+          })}
+        </div>
       </div>
     </div>
   </div>
@@ -86,14 +80,23 @@ const categories = [...new Set(allPosts.map(post => post.data.category || 'tech'
     color: var(--p-text-color);
   }
 
+  .categories-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
   .categories-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
   }
 
   .category-card {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 250px;
     padding: 1.5rem;
     border: 1px solid #d1d5db; /* 使用更明显的灰色边框 */
     border-radius: var(--p-border-radius-md);
@@ -101,6 +104,24 @@ const categories = [...new Set(allPosts.map(post => post.data.category || 'tech'
     color: var(--p-text-color);
     transition: all var(--p-transition-duration);
     background-color: var(--p-surface-0);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    .categories-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .categories-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   .category-card:hover {
@@ -111,15 +132,17 @@ const categories = [...new Set(allPosts.map(post => post.data.category || 'tech'
 
   .category-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    flex: 1;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--p-surface-200);
   }
 
   .category-header h3 {
-    margin: 0;
+    margin: 0 0 0.5rem 0;
     color: var(--p-primary-700);
     font-size: 1.25rem;
   }
