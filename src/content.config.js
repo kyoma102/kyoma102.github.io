@@ -12,6 +12,7 @@ const posts = defineCollection({
 		coverImage: z.string().optional(),    // 封面图片路径
 		readingStatus: z.enum(['to-read', 'reading', 'finished', 'abandoned']).optional(),  // 阅读状态
 		rating: z.number().min(0).max(5).optional(),  // 评级，0-5分
+		finishDate: z.string().optional(),    // 完成阅读日期
 	}),
 });
 

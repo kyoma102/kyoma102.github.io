@@ -5,6 +5,7 @@ publishDate: 05 Dec 2025
 category: books
 coverImage: /images/books/高度敏感的力量.jpg
 readingStatus: finished
+finishDate: 07 Dec 2025
 rating: 4
 ---
 

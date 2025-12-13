@@ -6,7 +6,7 @@ export async function getStaticPaths() {
   // 获取所有文章并提取唯一分类
   const allPosts = await getCollection('posts');
   const categories = [...new Set(allPosts.map(post => post.data.category || 'tech'))];
-  
+
   // 为每个分类生成路径
   return categories.map(category => ({
     params: { category },
@@ -25,85 +25,88 @@ const title = `${category.charAt(0).toUpperCase() + category.slice(1)} Category`
 const description = `Articles in the ${category} category.`;
 const permalink = `${Astro.site.href}category/${category}`;
 
+// 定义状态标签
+const statusLabels = {
+  'to-read': 'To Read',
+  'reading': 'Reading',
+  'finished': 'Finished',
+  'abandoned': 'Abandoned'
+};
+
 // 获取所有唯一分类用于导航
 const allCategories = [...new Set(allPosts.map(post => post.data.category || 'tech'))];
+
+// 为书籍分类准备按状态分组的数据
+let currentPosts = sortedPosts;
+if (category === 'books') {
+  const statusParam = Astro.url.searchParams.get('status');
+  if (statusParam && statusParam !== 'all') {
+    currentPosts = sortedPosts.filter(post => post.data.readingStatus === statusParam);
+  }
+}
 ---
 
 <BaseLayout title={title} description={description} permalink={permalink} current="category">
   <div class="container">
-    <h1>{category.charAt(0).toUpperCase() + category.slice(1)} Posts</h1>
-    
-    <!-- Category navigation -->
-    <div class="category-nav">
-      <a href="/" class="category-link">Home</a>
-      {allCategories.map(cat => (
-        <a 
-          href={`/category/${cat}`} 
-          class={`category-link ${category === cat ? 'active' : ''}`}
-        >
-          {cat.charAt(0).toUpperCase() + cat.slice(1)}
-        </a>
-      ))}
-    </div>
-    
+
     <!-- 显示分类文章 -->
     {sortedPosts.length > 0 ? (
       category === 'books' ? (
-        // 书籍分类使用网格布局显示封面、状态和评级
-        <div class="books-grid">
-          {sortedPosts.map((post) => {
+        // 书籍分类使用标签页布局
+        <div class="books-container">
+          <div class="books-tabs">
+            {['all', 'to-read', 'reading', 'finished', 'abandoned'].map(status => {
+              const count = status === 'all'
+                ? sortedPosts.length
+                : sortedPosts.filter(post => post.data.readingStatus === status).length;
 
+              // 确定当前激活的状态
+              const currentStatus = Astro.url.searchParams.get('status') || 'all';
+              const href = status === 'all'
+                ? `/category/${category}`
+                : `/category/${category}?status=${status}`;
+              return (
+                <a
+                  href={href}
+                  class={`tab-button ${currentStatus === status ? 'active' : ''}`}
+                  data-status={status}
+                >
+                  {status === 'all' ? 'All' : statusLabels[status]}
+                  <span class="tab-count">{count}</span>
+                </a>
+              );
+            })}
+          </div>
 
-            const statusLabels = {
-              'to-read': 'To Read',
-              'reading': 'Reading',
-              'finished': 'Finished',
-              'abandoned': 'Abandoned'
-            };
-
-            return (
-              <div class="book-card">
-                <div>
-                  {post.data.coverImage ? (
-                    <img
-                      src={post.data.coverImage}
-                      alt={post.data.title}
-                      class="book-cover"
-                      onError={(e) => {
-                        // 如果图片加载失败，显示占位图
-                        e.target.src = '/images/books/placeholder.svg';
-                      }}
-                    />
-                  ) : (
-                    <div class="book-cover-placeholder">
-                      <span>No Cover</span>
-                    </div>
-                  )}
-
-                  <div class="book-info">
-                    <h3>{post.data.title}</h3>
-
-                    <div class="book-status">
-                      <span class={`status-badge status-${post.data.readingStatus || 'to-read'}`}>
-                        {statusLabels[post.data.readingStatus || 'to-read']}
-                      </span>
-                    </div>
-
-                    <div class="book-rating">
-                      <div class="stars">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <span key={i} class={`star ${i < (post.data.rating || 0) ? 'filled' : ''}`}>&#9733;</span>
-                        ))}
+          <div class="books-grid">
+            {currentPosts.map((post) => {
+              return (
+                <div class="book-card">
+                  <div>
+                    {post.data.coverImage ? (
+                      <img
+                        src={post.data.coverImage}
+                        alt={post.data.title}
+                        class="book-cover"
+                        onError={(e) => {
+                          // 如果图片加载失败，显示占位图
+                          e.target.src = '/images/books/placeholder.svg';
+                        }}
+                      />
+                    ) : (
+                      <div class="book-cover-placeholder">
+                        <span>No Cover</span>
                       </div>
-                      {post.data.rating !== undefined && (
-                        <span class="rating-value">{post.data.rating}/5</span>
-                      )}
+                    )}
+
+                    <div class="book-info">
+                      <h3>{post.data.title}</h3>
                     </div>
                   </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       ) : (
         // 非书籍分类使用原始布局
@@ -131,13 +134,82 @@ const allCategories = [...new Set(allPosts.map(post => post.data.category || 'te
   </div>
 </BaseLayout>
 
+
 <style>
   .container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
   }
-  
+
+  .books-container {
+    width: 100%;
+  }
+
+  .books-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--p-surface-300);
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .books-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-button {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid transparent;
+    background-color: transparent;
+    border-radius: var(--p-border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    color: var(--p-text-color);
+    text-decoration: none;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .tab-button:hover {
+    background-color: var(--p-surface-100);
+  }
+
+  .tab-button.active {
+    background-color: var(--p-emerald-100);
+    border-color: var(--p-emerald-500);
+    color: var(--p-emerald-700);
+  }
+
+  .tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--p-emerald-500);
+  }
+
+  .tab-count {
+    margin-left: 0.5rem;
+    background-color: var(--p-surface-300);
+    color: var(--p-text-color);
+    border-radius: 9999px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .tab-button.active .tab-count {
+    background-color: var(--p-emerald-500);
+    color: white;
+  }
+
   h2,
   .post-item-footer {
     font-family: var(--font-family-sans);
@@ -150,7 +222,7 @@ const allCategories = [...new Set(allPosts.map(post => post.data.category || 'te
     text-transform: uppercase;
     margin-right: 16px;
   }
-  
+
   .post-category {
     color: var(--p-emerald-500);
     text-align: left;
@@ -161,13 +233,13 @@ const allCategories = [...new Set(allPosts.map(post => post.data.category || 'te
   hr {
     margin: 60px auto;
   }
-  
+
   .category-nav {
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
   }
-  
+
   .category-link {
     padding: 0.5rem 1rem;
     border: 1px solid var(--p-surface-300);
@@ -176,18 +248,18 @@ const allCategories = [...new Set(allPosts.map(post => post.data.category || 'te
     color: var(--p-text-color);
     transition: all var(--p-transition-duration);
   }
-  
+
   .category-link:hover {
     background-color: var(--p-surface-100);
     border-color: var(--p-surface-400);
   }
-  
+
   .category-link.active {
     background-color: var(--p-emerald-100);
     border-color: var(--p-emerald-500);
     color: var(--p-emerald-700);
   }
-  
+
   .post-item a {
     text-decoration: none;
     color: inherit;
@@ -243,6 +315,11 @@ const allCategories = [...new Set(allPosts.map(post => post.data.category || 'te
 
   .book-info {
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }
 
   .book-info h3 {
@@ -284,10 +361,18 @@ const allCategories = [...new Set(allPosts.map(post => post.data.category || 'te
     color: #d32f2f;
   }
 
+  .finish-date {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+  }
+
   .book-rating {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    gap: 0.5rem;
   }
 
   .stars {

@@ -70,7 +70,6 @@ const statusLabels = {
                     <span key={i} class={`star ${i < (post.data.rating || 0) ? 'filled' : ''}`}>&#9733;</span>
                   ))}
                 </div>
-                <span class="rating-value">({post.data.rating}/5)</span>
               </div>
             )}
           </div>
@@ -125,6 +124,8 @@ const statusLabels = {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    justify-content: center;
+    align-items: flex-start;
   }
 
   .book-status {
