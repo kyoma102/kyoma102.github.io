@@ -77,7 +77,10 @@ const allBooksData = JSON.stringify(sortedPosts.map(post => ({
           <div class="books-grid" id="books-grid">
             {sortedPosts.map((post) => {
               return (
-                <div class="book-card" data-status={post.data.readingStatus || 'to-read'}>
+                <div
+                  class="book-card visible"
+                  data-status={post.data.readingStatus || 'to-read'}
+                >
                   <div>
                     {post.data.coverImage ? (
                       <img
@@ -164,9 +167,15 @@ const allBooksData = JSON.stringify(sortedPosts.map(post => ({
       bookCards.forEach(card => {
         const status = card.getAttribute('data-status');
         if (currentStatus === 'all' || status === currentStatus) {
-          card.style.display = 'block';
+          card.classList.remove('hidden');
+          setTimeout(() => {
+            card.classList.add('visible');
+          }, 10); // 小延迟确保transition生效
         } else {
-          card.style.display = 'none';
+          card.classList.remove('visible');
+          setTimeout(() => {
+            card.classList.add('hidden');
+          }, 10); // 小延迟确保transition生效
         }
       });
     }
@@ -358,8 +367,24 @@ const allBooksData = JSON.stringify(sortedPosts.map(post => ({
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s ease;
     height: fit-content;
+    opacity: 1;
+    will-change: opacity, transform;
+  }
+
+  .book-card.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px) scale(0.98);
+    pointer-events: none;
+  }
+
+  .book-card.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
   }
 
   .book-card:hover {
