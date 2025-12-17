@@ -4,7 +4,7 @@ slug: courage-to-be-hated-notes
 publishDate: 09 Dec 2025
 category: books
 coverImage: /images/books/被讨厌的勇气.jpg
-readingStatus: reading
+readingStatus: finished
 rating: 3
 ---
 
