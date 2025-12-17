@@ -1,7 +1,7 @@
 ---
 title: 使用 GAS 批量标记 Gmail 邮件为已读
 slug: gas-auto-clean-gmail
-publishDate: 01 Dec 2025
+publishDate: Dec 01, 2025
 category: tech
 ---
 

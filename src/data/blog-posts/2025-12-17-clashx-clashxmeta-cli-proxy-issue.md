@@ -1,7 +1,7 @@
 ---
 title: 从 ClashX 切换到 ClashX.Meta 后，CLI 工具无法联网的原因与解决
 slug: clashx-clashxmeta-cli-proxy-issue
-publishDate: 2025-12-17
+publishDate: Dec 17, 2025
 category: tech
 ---
 
